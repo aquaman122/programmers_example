@@ -20,12 +20,16 @@ let youtubers = [
     videoNum : "142개"
   }
 ];
+var id = 1;
 youtubers.forEach((item, idx) => {
-  db.set(idx+1, item);
+  db.set(id++, item);
 })
 
+app.get('/youtubers', function (req, res) {
+  res.json(youtubers)
+});
 
-app.get('/youtuber/:id', function(req, res) {
+app.get('/youtubers/:id', function(req, res) {
   let {id} = req.params;
   id = parseInt(id);
 
@@ -37,6 +41,17 @@ app.get('/youtuber/:id', function(req, res) {
   } else {
     res.json(youtuber);
   }
+});
+
+app.use(express.json()); // 미들웨어 모듈
+app.post('/youtubers', function (req, res) {
+  db.set(id++, req.body);
+
+  res.json({
+    message : `${db.get(id-1).channelTitle}님 유튜버 생활을 응원합니다.`
+  });
+  console.log(req.body);
+  
 });
 
 app.listen(1234);
