@@ -20,7 +20,7 @@ let youtubers = [
     videoNum : "142개"
   }
 ];
-var id = 1;
+let id = 1;
 youtubers.forEach((item, idx) => {
   db.set(id++, item);
 })
