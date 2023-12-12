@@ -1,3 +1,4 @@
+const { json } = require('express');
 const express = require('express');
 const app = express();
 
@@ -20,13 +21,16 @@ let youtubers = [
     videoNum : "142개"
   }
 ];
+
 let id = 1;
 youtubers.forEach((item, idx) => {
   db.set(id++, item);
 })
 
 app.get('/youtubers', function (req, res) {
-  res.json(youtubers)
+  let youtubers = {}
+  db.forEach((value, key) => {youtubers[key] = value});
+  res.json(youtubers);
 });
 
 app.get('/youtubers/:id', function(req, res) {
