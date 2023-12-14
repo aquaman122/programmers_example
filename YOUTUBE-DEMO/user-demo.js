@@ -8,11 +8,11 @@ const db = [];
 // 로그인
 app.use(express.json());
 app.post('/login', (req, res) => {
-  const email = db.find(v => v.email === req.body.email);
-  const pwd = db.find(v => v.pwd === req.body.pwd);
+  const emailPwd = db.find(v => v.email === req.body.email && v.pwd === req.body.pwd);
 
-  if (email || pwd) {
+  if (emailPwd) {
     res.send(`${email.username}님 하이요`);
+    hasUserId = true;
   } else {
     res.send('email 혹은 password가 틀림요');
   }
