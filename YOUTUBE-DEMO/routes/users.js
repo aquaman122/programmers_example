@@ -1,29 +1,28 @@
 const express = require("express");
-const app = express();
+const router = express.Router();
 
-app.listen(7777);
+router.use(express.json());
 
 const db = [];
 
 // 로그인
-app.use(express.json());
-app.post('/login', (req, res) => {
-  const emailPwd = db.find(v => v.email === req.body.email && v.pwd === req.body.pwd);
+router.post('/login', (req, res) => {
+  const userIdPwd = db.find(v => v.userId === req.body.userId && v.pwd === req.body.pwd);
 
-  if (emailPwd) {
-    res.send(`${email.username}님 하이요`);
+  if (userIdPwd) {
+    res.send(`${userId.username}님 하이요`);
     hasUserId = true;
   } else {
-    res.send('email 혹은 password가 틀림요');
+    res.send('userId 혹은 password가 틀림요');
   }
 });
 
 // 회원 가입
-app.post('/join', (req, res) => {
-  if(req.body.email === undefined) return res.status(404).send('유저 없음요');
+router.post('/join', (req, res) => {
+  if(req.body.userId === undefined) return res.status(404).send('유저 없음요');
   const users = {
     id: db.length + 1,
-    email: req.body.email,
+    userId: req.body.userId,
     pwd: req.body.pwd,
     username: req.body.username
   };
@@ -34,7 +33,7 @@ app.post('/join', (req, res) => {
   })
 });
 
-app
+router
   .route('/users/:id')
   // 회원 개별 조회
   .get((req, res) => {
@@ -44,7 +43,7 @@ app
       res.send('없음요');
     } else {
       res.json({
-        email: users.email,
+        userId: users.userId,
         username: users.username
       });
     }
@@ -58,5 +57,4 @@ app
     res.json(users);
   })
 
-
-
+module.exports = router;

@@ -1,13 +1,12 @@
 const express = require("express");
-const app = express();
+const router = express.Router();
 
-app.listen(7777);
-app.use(express.json());
+router.use(express.json());
 
 const db = [];
 // 채널 생성 POST /channel
-app
-  .route('/channels')
+router
+  .route('/')
   .post((req, res) => {
     
     let channel = {
@@ -27,14 +26,14 @@ app
     }
   })
   // 채널 전체 조회 GET /channel
-  .app.get((req, res) => {
+  .router.get((req, res) => {
     res.status(200).json(db);
   })
   
 
 // /chanell/:id 인 것들 route
-app
-  .route('/channel/:id')
+router
+  .route('/:id')
   // 채널 개별 조회 GET /channel/:id
   .get((req, res) => {
     const channel = db.find(v => v.id === parseInt(req.params.id));
@@ -75,3 +74,5 @@ app
       });
     }
   })
+
+module.exports = router;
