@@ -1,33 +1,40 @@
 const express = require("express");
 const router = express.Router();
+const conn = require('../mariadb');
 
 router.use(express.json());
 
-const db = [];
 // 채널 생성 POST /channel
 router
   .route('/')
   .post((req, res) => {
-    
-    let channel = {
-      id: db.length + 1,
-      channelTitle: req.body.channelTitle
-    };
-    
-    if (req.body.channelTitle === undefined) {
+    const {name, user_id} = req.body;
+    sql = `INSERT INTO channels VALUES(?, ?)`;
+    let values = [name, user_id];
+
+    if (name && user_id) {
+      conn.query(sql, values,
+        function(err, results) {
+          res.status(201).json({
+            message : `${name}님 응원합니다.`
+          });   
+        }
+      )
+    } else {
       res.status(404).json({
         message : '암것도 없음요'
-      });
-    } else {
-      db.push(channel);
-      res.status(201).json({
-        message : `${req.body.channelTitle}님 응원합니다.`
       });
     }
   })
   // 채널 전체 조회 GET /channel
-  .router.get((req, res) => {
-    res.status(200).json(db);
+  .get((req, res) => {
+    let sql = `SELECT * FROM channels`;
+
+    conn.query(sql,
+      function(err, results) {
+        res.status(200).json(results);
+      }
+    );
   })
   
 
@@ -36,43 +43,59 @@ router
   .route('/:id')
   // 채널 개별 조회 GET /channel/:id
   .get((req, res) => {
-    const channel = db.find(v => v.id === parseInt(req.params.id));
-
-    if (channel) {
-      res.status(200).json(channel);
+    const {user_id} = req.body;
+    let sql = `SELECT * FROM channels WHERE user_id = ?`;
+    let values = user_id;
+    
+    if (user_id) {
+      conn.query(sql, values,
+        function(err, results) {
+          if (results) {
+            res.status(200).json(results);
+          } else {
+            res.status(404).json({
+              message: '없음요'
+            });
+          }
+        }
+      );
     } else {
-      res.status(404).json({
-        message: '없음요'
-      })
+      res.status(400).end();
     }
   })
   // 채널 수정 PUT /channel/:id
   .put((req, res) => {
-    let channel = db.find(v => v.id === parseInt(req.params.id));
+    let sql = `UPDATE channels SET ()`
 
-    if (channel) {
-      channel.channelTitle = req.body.channelTitle;
-      res.status(200).json(channel);
-    } else {
-      res.status(404).json({
-        message: '없음요'
-      });
-    }
+    conn.query(sql, values,
+      function(err, results) {
+        if (results) {
+
+        } else {
+          res.status(404).json({
+            message: '없음요'
+          });
+        }
+      }  
+    )
   })
   // 채널 삭제 DELETE /channel/:id
   .delete((req, res) => {
-    let channel = db.find(v => v.id === parseInt(req.params.id));
+    let {user_id} = req.body;
+    let sql = `DELETE FROM channels WHERE user_id = ?`;
+    let values = user_id;
 
-    if (channel) {
-      res.status(200).send(`${channel.channelTitle}삭제했음요`);
-
-      const idx = db.indexOf(channel);
-      db.splice(idx, 1);
-    } else {
-      res.status(404).json({
-        message: '없음요'
-      });
-    }
-  })
+    conn.query(sql, values,
+      function(err, results) {
+        if(results) {
+          res.status(200).json(results);
+        } else {
+          res.status(404).json({
+            message: '없음요'
+          });
+        }
+      }  
+    )
+  });
 
 module.exports = router;
