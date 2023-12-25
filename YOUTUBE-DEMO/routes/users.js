@@ -1,9 +1,13 @@
 const express = require("express");
-const connection = require("../mariadb");
 const {body, param, validationResult} = require('express-validator');
 const router = express.Router();
-
 const conn = require('../mariadb');
+// jwt module
+const jwt = require('jsonwebtoken');
+// dotenv module
+const dotenv = require('dotenv');
+// dot env 선언
+dotenv.config();
 
 router.use(express.json());
 
@@ -43,11 +47,23 @@ router.post(
       }
 
       if (results[0]?.password === password) {
+        const token = jwt.sign({
+          email: results[0].email,
+          name: results[0].name
+        }, process.env.PRIVITE_KEY, {
+          expiresIn: "30m",
+          issuer : "jang"
+        });
+
+        res.cookie("token", token, {
+          httpOnly: true
+        });
+
         res.status(200).json({
           message: `${results[0].name}님 하이요`
         });
       } else {
-        res.status(404).send('아이디나 비밀번호가 틀림요');
+        res.status(403).send('아이디나 비밀번호가 틀림요');
       }
     }
   );
